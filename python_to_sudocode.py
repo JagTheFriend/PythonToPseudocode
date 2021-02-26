@@ -1,6 +1,7 @@
 import re
 
-PRINT_TO_OUTPUT = r"^print\(.\)$"
+# print() --> OUTPUT
+PRINT_TO_OUTPUT = r"print\((.*?)\)"
 
 
 class Main():
@@ -37,5 +38,12 @@ class Main():
         :return store_data():
         """
 
-        code = re.sub(PRINT_TO_OUTPUT, "OUTPUT", self.code)
-        return self.store_data(code)
+        code_between_in_print = self.code[self.code.find(
+            "(")+1:self.code.find(")")]
+        code = re.sub(PRINT_TO_OUTPUT,
+                      f"OUTPUT {code_between_in_print}", self.code)
+        print(code)
+        # return self.store_data(code
+
+
+# Main(code="print('gg')").output()
