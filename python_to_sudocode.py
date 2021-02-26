@@ -2,6 +2,8 @@ import re
 
 # print() --> OUTPUT
 PRINT_TO_OUTPUT = r"(.*?)print\((.*?)\)"
+# \t\nprint() --> \t\nOUTPUT
+PRINT_TO_OUTPUT_INDENTED = r":\n\t(.*?)print\((.*?)\)"
 
 IF_logic = r"^if (.*?) :"
 IF_2_logic = r"^if (.*?):"
@@ -40,13 +42,17 @@ class Main():
         """
         Converts 
             `print` to `OUTPUT`
-
+            `\n\tprint` to `\n\tOUTPUT`
         :return _if():
         """
 
         code_in_print = self.code[self.code.find("(")+1:self.code.find(")")]
+
         self.code = re.sub(
-            PRINT_TO_OUTPUT, f"OUTPUT {code_in_print}", self.code)
+            PRINT_TO_OUTPUT, f"\tOUTPUT {code_in_print}", self.code
+        ) or re.sub(
+            PRINT_TO_OUTPUT_INDENTED, f"OUTPUT {code_in_print}", self.code
+        )
 
         return self._if()
 
@@ -55,6 +61,7 @@ class Main():
         Converts:
             `if [condition]:` to `IF [condition] THEN`
 
+        :return store_data():
         """
 
         logic_in_if = re.findall(f"{IF_logic}", self.code)
