@@ -1,7 +1,13 @@
 import re
 
 # print() --> OUTPUT
-PRINT_TO_OUTPUT = r"print\((.*?)\)"
+PRINT_TO_OUTPUT = r"(.*?)print\((.*?)\)"
+
+IF_logic = r"^if (.*?) :"
+IF_2_logic = r"^if (.*?):"
+
+IF_STMT = r"(.*?)if (.*?):"
+IF_STMT_2 = r"(.*?)if (.*?) :"
 
 
 class Main():
@@ -21,7 +27,7 @@ class Main():
         with open("code.txt", "r") as file:
             return file.readlines()
 
-    def store_data(self, code: str = ''):
+    def store_data(self, code):
         """
         Stores the code in a file called: `output.txt`
         :return None:
@@ -35,15 +41,32 @@ class Main():
         Converts 
             `print` to `OUTPUT`
 
-        :return store_data():
+        :return _if():
         """
 
-        code_between_in_print = self.code[self.code.find(
-            "(")+1:self.code.find(")")]
-        code = re.sub(PRINT_TO_OUTPUT,
-                      f"OUTPUT {code_between_in_print}", self.code)
-        print(code)
-        # return self.store_data(code
+        code_in_print = self.code[self.code.find("(")+1:self.code.find(")")]
+        self.code = re.sub(
+            PRINT_TO_OUTPUT, f"OUTPUT {code_in_print}", self.code)
+
+        return self._if()
+
+    def _if(self):
+        """
+        Converts:
+            `if [condition]:` to `IF [condition] THEN`
+
+        """
+
+        logic_in_if = re.findall(f"{IF_logic}", self.code)
+        logic_in_if_2 = re.findall(f"{IF_2_logic}", self.code)
+
+        code = ""
+        for i in [logic_in_if, logic_in_if_2]:
+            for logic in i:
+                code = re.sub(IF_STMT, f"IF {logic} THEN", self.code)
+
+        return self.store_data(code)
 
 
-# Main(code="print('gg')").output()
+code = "if g == 8:\t\nprint('gg')\nif hyman == 5 :\n\tprint('ded')"
+Main(code=code).output()
