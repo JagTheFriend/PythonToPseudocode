@@ -20,6 +20,9 @@ VARIABLE = r"(.*?) = (.*?)"
 VARIABLE_2 = r"(.*?): \[(.*?)\] = (.*?)"
 VARIABLE_3 = r"(.*?)=(.*?)"
 
+# DEF
+DEF = r"def (.*?)\((.*?)\):"
+
 
 class Main():
     def __init__(self):
@@ -105,7 +108,7 @@ class Main():
         Converts:
             `q = 4` to `q <- 4`
 
-        :return save_code()
+        :return _def():
         """
 
         for index, i in enumerate(self.code):
@@ -117,21 +120,46 @@ class Main():
                     variable = new_var[0] + " "
 
                 if re.findall(VARIABLE, i):
-                    self.code[index] = re.sub(f"{VARIABLE}", f"{variable}<-{str(value)[0]}", i)
+                    self.code[index] = re.sub(
+                        f"{VARIABLE}", f"{variable}<-{str(value)[0]}", i)
                     continue
 
                 if re.findall(VARIABLE_2, i):
-                    self.code[index] = re.sub(f"{VARIABLE_2}", f"{variable}<-{str(value)[0]}", i)
-                    continue 
+                    self.code[index] = re.sub(
+                        f"{VARIABLE_2}", f"{variable}<-{str(value)[0]}", i)
+                    continue
 
                 if re.findall(VARIABLE_3, i):
-                    self.code[index] = re.sub(f"{VARIABLE_3}", f"{variable}<- {str(value)[0]}", i)
+                    self.code[index] = re.sub(
+                        f"{VARIABLE_3}", f"{variable}<- {str(value)[0]}", i)
                     continue
 
             except ValueError:
                 continue
 
-        print(self.code)
+        return self._def()
+
+    def _def(self):
+        """
+        Converts:
+            `def Name()` to `FUNCTION Name()`
+
+        :return save_code():
+        """
+
+        for index, i in enumerate(self.code):
+            # loop though the string
+            # get the logic
+            try:
+                function = i[i.index("def ") + len("def"):-1]
+                func_name = function.split("(")[0]  # gets the function name
+                func_parameters = function.split(
+                    "(")[1][:-2]  # gets the parameter
+                self.code[index] = re.sub(
+                    DEF, f"PROCEDURE{func_name}({func_parameters})", i)
+            except ValueError:
+                continue
+
         return self.save_code()
 
 
