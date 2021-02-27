@@ -8,8 +8,8 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "program": "translator.py",
-            "console": "integratedTerminal"
+            "program": "${file}",
+            "console": "externalTerminal"
         }
     ]
 }

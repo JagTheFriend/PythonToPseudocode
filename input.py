@@ -1,8 +1,13 @@
-import python_to_sudocode
+import sys
+import translator
 
-code = str(input("Please enter the python code: \n"))
+print("Please enter the python code: \n")
+code = sys.stdin.read()
+
+
+print("Processing your code")
 with open("code.txt", "w") as file:
     file.write(code)
 
-print()
-python_to_sudocode.Main(code=code).output()
+translator.Main()
+print("Your code has been processed successfully \nPlease check the file named: `output.txt`")
