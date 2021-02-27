@@ -21,7 +21,10 @@ VARIABLE_2 = r"(.*?): \[(.*?)\] = (.*?)"
 VARIABLE_3 = r"(.*?)=(.*?)"
 
 # DEF
-DEF = r"def (.*?)\((.*?)\):"
+DEF_FORMAT = r"def (.*?)\((.*?)\):"
+
+# FOR STATEMENT
+FOR_FORMAT = r"for (.*?) in range\((.*?), (.*?)\)"
 
 
 class Main():
@@ -96,7 +99,6 @@ class Main():
             # get the logic
             try:
                 logic = i[i.index("while") + len("while"):-2]
-
                 self.code[index] = re.sub(WHILE_FORMAT, f"WHILE{logic} DO", i)
             except ValueError:
                 continue
@@ -144,6 +146,29 @@ class Main():
         Converts:
             `def Name()` to `FUNCTION Name()`
 
+        :return _for():
+        """
+
+        for index, i in enumerate(self.code):
+            # loop though the string
+            # get the funcion name and parameter(s)
+            try:
+                function = i[i.index("def ") + len("def"):-1]
+                func_name = function.split("(")[0]  # gets the function name
+                func_parameters = function.split(
+                    "(")[1][:-2]  # gets the parameter
+                self.code[index] = re.sub(
+                    DEF_FORMAT, f"PROCEDURE{func_name}({func_parameters})", i)
+            except ValueError:
+                continue
+        
+        return self._for()
+
+    def _for(self):
+        """
+        Converts:
+            `def Name()` to `FUNCTION Name()`
+
         :return save_code():
         """
 
@@ -151,12 +176,10 @@ class Main():
             # loop though the string
             # get the logic
             try:
-                function = i[i.index("def ") + len("def"):-1]
-                func_name = function.split("(")[0]  # gets the function name
-                func_parameters = function.split(
-                    "(")[1][:-2]  # gets the parameter
-                self.code[index] = re.sub(
-                    DEF, f"PROCEDURE{func_name}({func_parameters})", i)
+                variable = i[i.index("for") + len("for"):-2].split("in")[0]
+                start, end = i[i.index("for") + len("for"):-2].split("in")[1][len("range(")+1:-1].split(",")
+                end = end if end[0] != " " else end[1:]
+                self.code[index] = re.sub(FOR_FORMAT, f"FOR{variable}<- {start} TO {end}", i)
             except ValueError:
                 continue
 
