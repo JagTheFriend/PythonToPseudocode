@@ -25,6 +25,7 @@ DEF_FORMAT = r"def (.*?)\((.*?)\):"
 
 # FOR STATEMENT
 FOR_FORMAT = r"for (.*?) in range\((.*?), (.*?)\)"
+FOR_FORMAT_2 = r"for (.*?) in range\((.*?),(.*?)\)"
 
 
 class Main():
@@ -161,7 +162,7 @@ class Main():
                     DEF_FORMAT, f"PROCEDURE{func_name}({func_parameters})", i)
             except ValueError:
                 continue
-        
+
         return self._for()
 
     def _for(self):
@@ -177,9 +178,20 @@ class Main():
             # get the logic
             try:
                 variable = i[i.index("for") + len("for"):-2].split("in")[0]
-                start, end = i[i.index("for") + len("for"):-2].split("in")[1][len("range(")+1:-1].split(",")
+                start, end = i[i.index(
+                    "for") + len("for"):-2].split("in")[1][len("range(")+1:-1].split(",")
                 end = end if end[0] != " " else end[1:]
-                self.code[index] = re.sub(FOR_FORMAT, f"FOR{variable}<- {start} TO {end}", i)
+
+                if re.findall(FOR_FORMAT, i):
+                    self.code[index] = re.sub(
+                        FOR_FORMAT, f"FOR{variable}<- {start} TO {end}", i)
+                    continue
+
+                if re.findall(FOR_FORMAT_2, i):
+                    self.code[index] = re.sub(
+                        FOR_FORMAT_2, f"FOR{variable}<- {start} TO {end}", i)
+                    continue
+
             except ValueError:
                 continue
 
