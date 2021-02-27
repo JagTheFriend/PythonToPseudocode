@@ -10,14 +10,16 @@ CHARACTERS = [
 PRINT_FORMAT = r"print\((.*?)\)"
 
 # IF STATEMENTS
-IF_logic = r"^if (.*?) :"
-IF_2_logic = r"^if (.*?):"
-IF_STMT = r"(.*?)if (.*?):"
+IF_FORMAT = r"if (.*?):"
+
+# WHILE STATEMENTS
+WHILE_FORMAT = r"while (.*?):"
+
 
 class Main():
     def __init__(self):
         self.code = self.get_code()
-    
+
     def save_code(self) -> None:
         with open("output.txt", "w") as file:
             file.writelines(self.code)
@@ -30,46 +32,67 @@ class Main():
         with open("code.txt", "r") as file:
             return file.readlines()
 
-    def output(self):
+    def _print(self):
         """
         Converts:
             `print()` to `OUTPUT ""`
-        
+
         :return _if():
         """
 
         # loop thought the array
         for index, i in enumerate(self.code):
             # loop though the string
-            code_in_brackets = i[11:-2] # gets the code inside the print statement
-            self.code[index] = re.sub(PRINT_FORMAT, f"OUTPUT \"{code_in_brackets}\"", i)
+            # gets the code inside the print statement
+            try:
+                code_in_brackets = i[i.index("print(") + len("print("):-2]
+
+                self.code[index] = re.sub(
+                    PRINT_FORMAT, f"OUTPUT {code_in_brackets}", i)
+            except ValueError:
+                continue
 
         return self._if()
 
-    
     def _if(self) -> None:
         """
         Converts:
             `if [condition]` to `IF [condition] THEN`
-        """
 
-        # loop thought the array
+        :return _while():
+        """
         for index, i in enumerate(self.code):
             # loop though the string
-            code_in_brackets = i[11:-2] # gets the code inside the print statement
-            self.code[index] = re.sub(PRINT_FORMAT, f"OUTPUT \"{code_in_brackets}\"", i)
+            # get the logic
+            try:
+                logic = i[i.index("if") + len("if"):-2]
 
+                self.code[index] = re.sub(
+                    IF_FORMAT, f"IF{logic} THEN", i)
+            except ValueError:
+                continue
+        return self._while()
+
+    def _while(self):
+        """
+        Converts:
+            `if [condition]` to `IF [condition] THEN`
+
+        :return save_code():
+        """
         for index, i in enumerate(self.code):
-            logic_in_if = re.findall(f"{IF_logic}", self.code[index])
-            logic_in_if_2 = re.findall(f"{IF_2_logic}", self.code[index])
+            # loop though the string
+            # get the logic
+            try:
+                logic = i[i.index("while") + len("while"):-2]
 
-            for logics in [logic_in_if, logic_in_if_2]:
-                if logics:
-                    for logic in logics:
-                        self.code[index] = re.sub(IF_STMT, f"IF {logic} THEN", self.code[index])
+                self.code[index] = re.sub(
+                    WHILE_FORMAT, f"WHILE{logic} DO", i)
+            except ValueError:
+                continue
 
-        return self.save_code()
+        print(self.code)
+        self.save_code()
 
 
-code = "print('ggg')"
-Main().output()
+Main()._print()
