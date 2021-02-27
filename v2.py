@@ -15,6 +15,11 @@ IF_FORMAT = r"if (.*?):"
 # WHILE STATEMENTS
 WHILE_FORMAT = r"while (.*?):"
 
+# VARIABLE equals VALUE
+VARIABLE = r"(.*?) = (.*?)"
+VARIABLE_2 = r"(.*?):\[(.*?)\] = (.*?)"
+VARIABLE_3 = r"(.*?)=(.*?)"
+
 
 class Main():
     def __init__(self):
@@ -29,6 +34,7 @@ class Main():
         Returns the code stored in `code.txt`
         :return STRING ARRAY:
         """
+
         with open("code.txt", "r") as file:
             return file.readlines()
 
@@ -61,14 +67,14 @@ class Main():
 
         :return _while():
         """
+
         for index, i in enumerate(self.code):
             # loop though the string
             # get the logic
             try:
                 logic = i[i.index("if") + len("if"):-2]
 
-                self.code[index] = re.sub(
-                    IF_FORMAT, f"IF{logic} THEN", i)
+                self.code[index] = re.sub(IF_FORMAT, f"IF{logic} THEN", i)
             except ValueError:
                 continue
         return self._while()
@@ -78,21 +84,42 @@ class Main():
         Converts:
             `if [condition]` to `IF [condition] THEN`
 
-        :return save_code():
+        :return variable_equals_value():
         """
+
         for index, i in enumerate(self.code):
             # loop though the string
             # get the logic
             try:
                 logic = i[i.index("while") + len("while"):-2]
 
+                self.code[index] = re.sub(WHILE_FORMAT, f"WHILE{logic} DO", i)
+            except ValueError:
+                continue
+
+        return self.variable_equals_value()
+
+    def variable_equals_value(self):
+        """
+        Converts:
+            `q = 4` to `q <- 4`
+
+        :return save_code()
+        """
+
+        for index, i in enumerate(self.code):
+            # loop though the string
+            # get the variable and its value
+            try:
+                variable, value = i.split("=")
                 self.code[index] = re.sub(
-                    WHILE_FORMAT, f"WHILE{logic} DO", i)
+                    f"{VARIABLE}", f"{variable}<-{str(value)[0]}", i)
+
             except ValueError:
                 continue
 
         print(self.code)
-        self.save_code()
+        return self.save_code()
 
 
 Main()._print()
