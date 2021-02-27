@@ -17,13 +17,14 @@ WHILE_FORMAT = r"while (.*?):"
 
 # VARIABLE equals VALUE
 VARIABLE = r"(.*?) = (.*?)"
-VARIABLE_2 = r"(.*?):\[(.*?)\] = (.*?)"
+VARIABLE_2 = r"(.*?): \[(.*?)\] = (.*?)"
 VARIABLE_3 = r"(.*?)=(.*?)"
 
 
 class Main():
     def __init__(self):
         self.code = self.get_code()
+        self._print()
 
     def save_code(self) -> None:
         with open("output.txt", "w") as file:
@@ -112,8 +113,20 @@ class Main():
             # get the variable and its value
             try:
                 variable, value = i.split("=")
-                self.code[index] = re.sub(
-                    f"{VARIABLE}", f"{variable}<-{str(value)[0]}", i)
+                if new_var := variable.split(":"):
+                    variable = new_var[0] + " "
+
+                if re.findall(VARIABLE, i):
+                    self.code[index] = re.sub(f"{VARIABLE}", f"{variable}<-{str(value)[0]}", i)
+                    continue
+
+                if re.findall(VARIABLE_2, i):
+                    self.code[index] = re.sub(f"{VARIABLE_2}", f"{variable}<-{str(value)[0]}", i)
+                    continue 
+
+                if re.findall(VARIABLE_3, i):
+                    self.code[index] = re.sub(f"{VARIABLE_3}", f"{variable}<- {str(value)[0]}", i)
+                    continue
 
             except ValueError:
                 continue
@@ -122,4 +135,4 @@ class Main():
         return self.save_code()
 
 
-Main()._print()
+Main()
