@@ -120,7 +120,7 @@ class Main():
             try:
                 variable, value = i.split("=")
                 if new_var := variable.split(":"):
-                    variable = new_var[0] + " "
+                    variable = new_var[0]
 
                 if re.findall(VARIABLE, i):
                     self.code[index] = re.sub(
@@ -160,7 +160,7 @@ class Main():
                     "(")[1][:-2]  # gets the parameter
                 self.code[index] = re.sub(
                     DEF_FORMAT, f"PROCEDURE{func_name}({func_parameters})", i)
-            except ValueError:
+            except (ValueError, IndexError):
                 continue
 
         return self._for()
@@ -170,7 +170,7 @@ class Main():
         Converts:
             `def Name()` to `FUNCTION Name()`
 
-        :return save_code():
+        :return small_to_caps():
         """
 
         for index, i in enumerate(self.code):
@@ -192,6 +192,38 @@ class Main():
                         FOR_FORMAT_2, f"FOR{variable}<- {start} TO {end}", i)
                     continue
 
+            except (ValueError, IndexError):
+                continue
+
+        return self.small_to_caps()
+
+    def small_to_caps(self):
+        """
+        Converts:
+            `break` -> `BREAK`
+            `return` -> `RETURN`
+            `#` -> `//`
+
+        :return save_code():
+        """
+
+        for index, i in enumerate(self.code):
+            # loop though the string
+            # get the function name and parameter(s)
+            try:
+                if "break" in i: # capitalize `break`
+                    self.code[index] = i.replace("break", "BREAK")
+                    continue
+
+                if "return" in i: # capitalize `return`
+                    self.code[index] = i.replace("return", "RETURN")
+                    continue
+
+                if "#" in i: # capitalize `#`
+                    self.code[index] = i.replace("#", "//")
+                    continue
+
+                self.code[index] = i
             except ValueError:
                 continue
 
