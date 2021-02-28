@@ -211,16 +211,20 @@ class Main():
             # loop though the string
             # get the function name and parameter(s)
             try:
-                if "break" in i: # capitalize `break`
+                if "break" in i:  # capitalize `break`
                     self.code[index] = i.replace("break", "BREAK")
                     continue
 
-                if "return" in i: # capitalize `return`
+                if "return" in i:  # capitalize `return`
                     self.code[index] = i.replace("return", "RETURN")
                     continue
 
-                if "#" in i: # capitalize `#`
+                if "#" in i:  # convert `#` to `//`
                     self.code[index] = i.replace("#", "//")
+                    continue
+
+                if "==" in i:  # convert `==` to `=`
+                    self.code[index] = i.replace("==", "=")
                     continue
 
                 self.code[index] = i
