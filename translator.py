@@ -223,10 +223,6 @@ class Main():
                     self.code[index] = i.replace("#", "//")
                     continue
 
-                if "==" in i:  # convert `==` to `=`
-                    self.code[index] = i.replace("==", "=")
-                    continue
-
                 self.code[index] = i
             except ValueError:
                 continue
